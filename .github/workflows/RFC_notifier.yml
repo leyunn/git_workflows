@@ -12,12 +12,14 @@ jobs:
     - name: Check if issue body contains RFC reference
       id: check-rfc-reference
       run: |
-        if grep -q "RFC: #[0-9]\+" <<< "$(<$GITHUB_EVENT_PATH | jq -r '.issue.body')"; then
-          rfc_id = (grep -o "RFC: #[0-9]\+" <<< "$(<$GITHUB_EVENT_PATH | jq -r '.issue.body')"
-          echo $rfc_id
-          echo "rfc_ref=$rfc_id" >> $GITHUB_OUTPUT
+        ISSUE_BODY="${{ github.event.issue.body }}"
+        ID_REGEX='id: #([0-9]+)' 
+        if [[ $ISSUE_BODY =~ $ID_REGEX ]]; then
+          echo "ID found: ${BASH_REMATCH[1]}"
+          echo "rfc_ref=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
         else
-          echo "rfc_ref=none" >> $GITHUB_OUTPUT
+            echo "No ID found."
+            echo "rfc_ref=none" >> $GITHUB_OUTPUT
         fi
 
     - name: Add comment to RFC discussion

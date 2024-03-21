@@ -28,7 +28,7 @@ jobs:
               echo "$label"
               if grep -q "$label" <<< "$TITLE"; then
                   # Append label to LABELS variable
-                  LABELS="$LABELS,$label"
+                  gh issue edit "$ISSUE_NUMBER" --add-label "$label"
               fi
           done
         env:

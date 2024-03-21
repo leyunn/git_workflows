@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Apply Labels
-        uses: "pascalgn/automerge-action@master"
+        uses: "pascalgn/automerge-action@lastest"
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           labels: |

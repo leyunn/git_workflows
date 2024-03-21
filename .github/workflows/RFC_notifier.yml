@@ -1,0 +1,34 @@
+name: Move RFC forward
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  check-issue:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check if issue body contains RFC reference
+      id: check-rfc-reference
+      run: |
+        if grep -q "RFC: #[0-9]\+" <<< "$(<$GITHUB_EVENT_PATH | jq -r '.issue.body')"; then
+          rfc_id = (grep -o "RFC: #[0-9]\+" <<< "$(<$GITHUB_EVENT_PATH | jq -r '.issue.body')"
+          echo $rfc_id
+          echo "rfc_ref=$rfc_id" >> $GITHUB_OUTPUT
+        else
+          echo "rfc_ref=none" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Add comment to RFC discussion
+      if: steps.check-rfc-reference.outputs.rfc_ref != 'none'
+      run: |
+        rfc_ref=${{ steps.check-rfc-reference.outputs.rfc_ref }}
+        issue_number=${{ github.event.issue.number }}
+        comment="This RFC has been moved forward to \#$issue_number"
+        curl -X POST \
+          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          -H "Accept: application/vnd.github.v3+json" \
+          -d "{\"body\": \"$comment\"}" \
+          "https://api.github.com/repos/${{ github.repository }}/issues/$(echo $rfc_ref | cut -d '#' -f 2)/comments"
+

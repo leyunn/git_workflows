@@ -16,25 +16,21 @@ jobs:
           LABELS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
                     -H "Accept: application/vnd.github.v3+json" \
                     https://api.github.com/repos/${{ github.repository }}/labels \
-                    | jq -r '.[].name')
-          echo "$LABELS"
-          echo "name=$LABELS" >> $GITHUB_OUTPUT
+                    | jq -r '.[].name' | paste -sd "," -)
+          echo "labels=$LABELS" >> $GITHUB_STATE
       - name: Check for Keywords and Set Labels
         run: |
-          EXISTING_LABELS="${{ steps.get_labels.outputs.labels }}"
-          LABELS=""
-          for label in $EXISTING_LABELS; do
-              if grep -q "$label" <<< "${{ github.event.issue.title }}"; then
+          IFS=','
+          read -ra EXISTING_LABELS <<< "${{steps.get_labels.state.labels}}"
+          ISSUE_NUMBER=${{ github.event.issue.number }}
+          TITLE=${{ github.event.issue.title }}
+          for label in ${EXISTING_LABELS[@]}; do
+              echo "$label"
+              if grep -q "$label" <<< "$TITLE"; then
                   # Append label to LABELS variable
                   LABELS="$LABELS,$label"
               fi
           done
-          # Remove leading comma if LABELS is not empty
-          if [ -n "$LABELS" ]; then
-              LABELS="${LABELS#,}"
-              # Set labels to the issue
-              gh issue edit ${{ github.event.issue.number }} --add-label "$LABELS"
-          fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}

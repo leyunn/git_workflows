@@ -34,7 +34,7 @@ jobs:
               # Set labels to the issue
               gh issue edit ${{ github.event.issue.number }} --add-label "$LABELS"
           fi
-      - env:
+        env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           NUMBER: ${{ github.event.issue.number }}

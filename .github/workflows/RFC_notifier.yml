@@ -13,7 +13,7 @@ jobs:
       id: check-rfc-reference
       run: |
         ISSUE_BODY="${{ github.event.issue.body }}"
-        ID_REGEX='id: #([0-9]+)' 
+        ID_REGEX='RFC: #([0-9]+)' 
         if [[ $ISSUE_BODY =~ $ID_REGEX ]]; then
           echo "ID found: ${BASH_REMATCH[1]}"
           echo "rfc_ref=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
@@ -29,7 +29,7 @@ jobs:
         issue_number=${{ github.event.issue.number }}
         comment_body="This RFC has been moved forward to \#$issue_number"
         COMMENT_API_URL="https://api.github.com/repos/${{ github.repository }}/comments/${post_id}/reactions"
-        AUTH_HEADER="Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}"
+        AUTH_HEADER="Authorization: Bearer ${{ secrets.commentor }}"
           
         curl -X POST \
         -H "Content-Type: application/json" \

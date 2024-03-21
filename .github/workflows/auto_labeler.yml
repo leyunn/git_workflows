@@ -1,0 +1,20 @@
+name: Auto Labeler
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  auto_label:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Apply Labels
+        uses: "pascalgn/automerge-action@master"
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          labels: |
+            { "bug": ["bug", "error", "issue"], "enhancement": ["feature", "improvement"], "documentation": ["doc", "readme"], "question": ["help", "question"] }
+

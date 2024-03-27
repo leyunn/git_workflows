@@ -26,9 +26,15 @@ jobs:
           TITLE="${{ github.event.issue.title }}"
           BODY="${{ github.event.issue.body }}"
           for label in ${EXISTING_LABELS[@]}; do
-              if grep -q "$label" <<< "$TITLE" || grep -q "$label" <<< "$BODY"; then
-                  # Append label to LABELS variable
-                  gh issue edit "$ISSUE_NUMBER" --add-label "$label"
+              label_name="${label##*:}" # Extracting latter part of label after ":"
+              if [[ "$label" == *":"* ]]; then
+                  if grep -q "$label_name" <<< "$TITLE" || grep -q "$label_name" <<< "$BODY"; then
+                      gh issue edit "$ISSUE_NUMBER" --add-label "$label"
+                  fi
+              else
+                  if grep -q "$label" <<< "$TITLE" || grep -q "$label" <<< "$BODY"; then
+                      gh issue edit "$ISSUE_NUMBER" --add-label "$label"
+                  fi
               fi
           done
         env:

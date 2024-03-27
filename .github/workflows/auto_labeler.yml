@@ -20,13 +20,13 @@ jobs:
           echo "labels=$LABELS" >> $GITHUB_OUTPUT
       - name: Check for Keywords and Set Labels
         run: |
-          IFS=',' 
+          IFS=','
           read -ra EXISTING_LABELS <<< "${{steps.get_labels.outputs.labels}}"
           ISSUE_NUMBER=${{ github.event.issue.number }}
           TITLE="${{ github.event.issue.title }}"
+          BODY="${{ github.event.issue.body }}"
           for label in ${EXISTING_LABELS[@]}; do
-              echo "$label"
-              if grep -q "$label" <<< "$TITLE"; then
+              if grep -q "$label" <<< "$TITLE" || grep -q "$label" <<< "$BODY"; then
                   # Append label to LABELS variable
                   gh issue edit "$ISSUE_NUMBER" --add-label "$label"
               fi

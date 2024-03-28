@@ -27,7 +27,7 @@ jobs:
         run: |
           post_id=${{ steps.check-rfc-reference.outputs.rfc_ref }}
           issue_number=${{ github.event.issue.number }}
-          comment_body="This RFC has been moved forward to #${issue_number}"
+          comment_body="This issue has been moved forward to #${issue_number}"
           COMMENT_API_URL="https://api.github.com/repos/${{ github.repository }}/issues/${post_id}/comments"
           AUTH_HEADER="Authorization: Bearer ${{ secrets.commentor }}"
 
